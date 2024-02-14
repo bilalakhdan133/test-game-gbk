@@ -9,14 +9,14 @@ const RoundScreen = ({ navigation }) => {
           title="1 Ronde"
           onPress={() => navigation.push('Play', {roundTotal: 1})}
         />
-        {/* <Button
+        <Button
           title="3 Ronde"
           onPress={() => navigation.navigate('Play', {roundTotal: 3})}
         />
         <Button
           title="5 Ronde"
           onPress={() => navigation.navigate('Play', {roundTotal: 5})}
-        /> */}
+        />
       </View>
     );
   };

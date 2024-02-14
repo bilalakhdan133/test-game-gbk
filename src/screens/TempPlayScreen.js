@@ -6,7 +6,7 @@ import {Route, IndexRoute} from 'react-router';
 const choices = ['rock', 'paper', 'scissors'];
 
 
-const PlayScreen = ({route}) => {
+const TempPlayScreen = ({route}) => {
   const { roundTotal } = route.params;
 
   const [playerChoice, setPlayerChoice] = useState(null);
@@ -149,7 +149,7 @@ const PlayScreen = ({route}) => {
 
 
 
-export default PlayScreen;
+export default TempPlayScreen;
 
 
 

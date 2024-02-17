@@ -1,13 +1,14 @@
 // ini buat nyimpen yang 1 3 5 round, gadipake
-import { View, Text, Button } from 'react-native';
+import { View, Text, Button, Modal } from 'react-native';
 import React, { useState } from 'react';
 import {Route, IndexRoute} from 'react-router';
+import { useNavigation } from '@react-navigation/native';
 
-const choices = ['rock', 'paper', 'scissors'];
+const choices = ['rock','paper','scissors'];
 
 
 const TempPlayScreen = ({route}) => {
-  const { roundTotal } = route.params;
+  const { roundTotal, roundTitle } = route.params;
 
   const [playerChoice, setPlayerChoice] = useState(null);
   const [computerChoice, setComputerChoice] = useState(null);
@@ -21,8 +22,12 @@ const TempPlayScreen = ({route}) => {
   const [compWins, setCompWins] = useState(0);
 
   const [allRound, setAllRound] = useState(roundTotal);
+  const [roundTitleShow, setRoundTitleShow] = useState(roundTitle);
+
   const [showModal, setShowModal] = useState(false);
   
+  const navigation = useNavigation();
+
   const generateComputerChoice = () => {
     return choices[Math.floor(Math.random() * choices.length)];
   };
@@ -36,7 +41,7 @@ const TempPlayScreen = ({route}) => {
     setComputerChoice(computerChoice);
 
     if (playerChoice === computerChoice) {
-      setResult('It\'s a tie!');
+      setResult('its a tie');
     } else if (
       (playerChoice === 'rock' && computerChoice === 'scissors') ||
       (playerChoice === 'paper' && computerChoice === 'rock') ||
@@ -45,105 +50,105 @@ const TempPlayScreen = ({route}) => {
       setResult('You win!');
       setPlayerFlag(playerFlag + 1);
     } else{
-      setResult('Computer wins!');
+      setResult('You Lose:(');
       setCompFlag(compFlag+1);
     }
 
     if (roundTotal == 1){
-      if(
+      if (playerChoice === computerChoice){
+        setResult('It\'s a tie!');
+      }
+      else if(
         (playerChoice === 'rock' && computerChoice === 'scissors') ||
         (playerChoice === 'paper' && computerChoice === 'rock') ||
         (playerChoice === 'scissors' && computerChoice === 'paper')
       ){
         setPlayerWins(playerWins+1);
-        setCompFlag(0);
-        setPlayerFlag(0);
-        // alert('You Win!');
         setShowModal(true);
+
       } else {
         setCompWins(compWins+1);
-        setCompFlag(0);
-        setPlayerFlag(0);
-        // alert('You Lose :(');
         setShowModal(true);
       }
     }
     else{
-      if (playerFlag + compFlag < roundTotal ) {
-        setRound(round + 1);
-      }
-      else if(playerFlag <= roundTotal || compFlag <=  roundTotal){
-        setRound(1);
-        if (playerFlag > compFlag){
-          setPlayerWins(playerWins+1);
-          setCompFlag(0);
-          setPlayerFlag(0);
-          // alert('You Win!');
-          setShowModal(true);
-        }else{
-          setCompWins(compWins+1);
-          setCompFlag(0);
-          setPlayerFlag(0);
-          // alert('You Lose :(');
-          setShowModal(true);
+        if (playerFlag + compFlag < roundTotal ) {
+          setRound(round + 1);
         }
+        else if(Math.max(playerFlag, compFlag) === roundTotal){
+          setRound(1);
+          if (playerFlag >= compFlag){
+            setResult('You win!');
+            setPlayerWins(playerWins+1);
+          setShowModal(true);
+          }
+          else if (playerFlag == compFlag){
+            setResult('It\'s a tie!');
+          }else{
+            setResult('Computer win!');
+            setCompWins(compWins+1);
+          setShowModal(true);
+          }
+          setCompFlag(0);
+          setPlayerFlag(0);
+      }
     }
-    
-   
-    }
-
-    // ini yang ori
-
-    // if (playerChoice === computerChoice) {
-    //   setResult('It\'s a tie!');
-    // } else if (
-    //   (playerChoice === 'rock' && computerChoice === 'scissors') ||
-    //   (playerChoice === 'paper' && computerChoice === 'rock') ||
-    //   (playerChoice === 'scissors' && computerChoice === 'paper')
-    // ) {
-    //   setResult('You win!');
-    //   setPlayerFlag(playerFlag + 1);
-    // } else {
-    //   setResult('Computer wins!');
-    // }
-
-    // if (round < roundTotal) {
-    //   setRound(round + 1);
-    // }else{
-    //   setRound(1);
-    // }
   
   };
 
-  return (
-    <div>
-      <h1>Rock, Paper, Scissors</h1>
-      <h1>Yang sampe {allRound} duluan menang! </h1>
-      {/* <h2>Round {round}</h2> */}
-    
-      <div>
-        <button onClick={() => playRound('rock')}>Rock</button>
-        <button onClick={() => playRound('paper')}>Paper</button>
-        <button onClick={() => playRound('scissors')}>Scissors</button>
-      </div>
-      <div>
-        {playerChoice && (
-          <p>You chose: {playerChoice}</p>
-        )}
-        {computerChoice && (
-          <p>Computer chose: {computerChoice}</p>
-        )}
-        <p>{result}</p>
-        <p>Player Wins: {playerWins}</p>
-        <p>Computer Wins: {compWins}</p>
+  const handlePlayAgain = () => {
+    setPlayerChoice(null);
+    setComputerChoice(null);
 
-      
-        <p>Player Flag: {playerFlag}</p>
-        <p>Computer Flag: {compFlag}</p>
-      
-      </div>
-    
-    </div>
+    setResult('');
+    setShowModal(false);
+
+    setPlayerWins(0);
+    setCompWins(0);
+  };
+
+  const handleExit = () => {
+    navigation.navigate('Home');
+    setPlayerWins(0);
+    setCompWins(0);
+  };
+  
+
+  return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    <Text>Rock, Paper, Scissors</Text>
+    <Text>Yang sampe {roundTotal} duluan menang!</Text>
+    <Text>{result}</Text>
+    <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginVertical: 20 }}>
+      <Button title="Rock" onPress={() => playRound('rock')} />
+      <Button title="Paper" onPress={() => playRound('paper')} />
+      <Button title="Scissors" onPress={() => playRound('scissors')} />
+    </View>
+
+    <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginVertical: 20 }}>
+        <Text>Player Wins: {playerWins} // </Text>
+        <Text>Computer Wins: {compWins} </Text>
+
+        <Text>=== Player Flag: {playerFlag} // </Text>
+        <Text>Computer Flag: {compFlag} </Text>
+
+        <Text>=== Player Choice: {playerChoice} // </Text>
+        <Text>Computer Choice: {computerChoice} </Text>
+    </View>
+ 
+    <Modal visible={showModal} animationType="slide" transparent>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <View style={{ backgroundColor: 'green', padding: 20, borderRadius: 10, alignItems: 'center' }}>
+          <Text>{result}</Text>
+          <View style={{ flexDirection: 'row', marginTop: 10 }}>
+            <Button title="Play Again" onPress={handlePlayAgain} />
+            <Button title="Exit" onPress={handleExit} />
+          </View>
+        </View>
+      </View>
+    </Modal>
+
+  </View>
   );
 };
 
